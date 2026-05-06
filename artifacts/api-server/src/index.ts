@@ -1,5 +1,7 @@
+import cron from "node-cron";
 import app from "./app";
 import { logger } from "./lib/logger";
+import { runStreakReminderJob } from "./lib/reminder";
 
 const rawPort = process.env["PORT"];
 
@@ -22,4 +24,13 @@ app.listen(port, (err) => {
   }
 
   logger.info({ port }, "Server listening");
+
+  // Run streak reminder every day at 8 PM UTC
+  cron.schedule("0 20 * * *", () => {
+    runStreakReminderJob().catch((err) => {
+      logger.error({ err }, "Streak reminder job failed");
+    });
+  });
+
+  logger.info("Streak reminder cron scheduled (daily at 20:00 UTC)");
 });
