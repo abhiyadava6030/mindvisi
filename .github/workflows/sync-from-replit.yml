@@ -1,0 +1,22 @@
+name: Replit Sync Audit
+
+# This workflow runs whenever Replit's post-merge script pushes to main.
+# It serves as an audit log: each run confirms the sync succeeded and
+# records the commit SHA and timestamp for traceability.
+# Actual syncing is performed by scripts/post-merge.sh in the Replit environment.
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log sync event
+        run: |
+          echo "Replit sync received at $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          echo "Commit SHA : ${{ github.sha }}"
+          echo "Ref        : ${{ github.ref }}"
+          echo "Pushed by  : ${{ github.actor }}"
