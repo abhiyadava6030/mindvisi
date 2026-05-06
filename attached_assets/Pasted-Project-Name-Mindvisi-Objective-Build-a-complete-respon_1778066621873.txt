@@ -1,0 +1,45 @@
+Project Name: Mindvisi
+
+Objective: Build a complete, responsive full-stack web application named "Mindvisi". The platform allows users to input their thoughts, emotions, or daily reflections and converts them into personalized animated visuals and targeted well-being or motivational suggestions.
+
+Key Features & Requirements:
+
+Authentication & User Management:
+
+OTP-based Authentication: Users must register and log in using an OTP sent to their mobile number/email.
+
+Forgot Password: Include a secure recovery option.
+
+Logout: A clear option to sign out of the session.
+
+User Dashboard & Privacy:
+
+User Data Capture: Collect Name and Phone Number upon registration. Automatically trigger a data transmission to the email address: abhiyadava6030@gmail.com with the user's details upon successful signup.
+
+Dashboard: A personalized dashboard where all user inputs (thoughts, generated visuals, and recommendations) are securely saved and displayed.
+
+Privacy Policy: A dedicated and prominent Privacy Policy page accessible from the footer.
+
+Mindvisi Core AI Engine:
+
+Input Field: A text area where users can type their raw emotions, stories, poems, gossips, anger, sadness, motivation, or feelings of love/pain.
+
+Personalized Animation/Visual Generation: The AI must analyze the specific words and emotions of the user. It should generate a unique, animated visual that strictly matches the user's mood and input. Ensure that no two outputs are identical, even if the general theme (e.g., sadness) is similar. The visuals must be highly tailored to the exact wording used.
+
+Personalized Recommendations: The AI system must greet the user by name and provide tailored recommendations based on their input:
+
+Suggested Books or Documentaries.
+
+Specific Yoga or Meditation/Dhyan practices.
+
+Motivational or coping advice.
+
+Tech Stack Recommendation:
+
+Frontend: React.js or Next.js for a smooth, interactive UI.
+
+Backend: Node.js or Python (Flask/FastAPI) to handle API requests.
+
+Database: Supabase or Firebase to securely store user data, thoughts, and dashboard history.
+
+AI Integration: An Image/Animation API (like DALL-E 3 or Stable Diffusion for visuals) and a Text Model (like GPT-4 or Gemini for mood analysis and recommendations).

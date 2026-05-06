@@ -3,13 +3,20 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Mindvisi API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: reflections
+    description: User reflection operations
+  - name: dashboard
+    description: Dashboard summary operations
+  - name: openai
+    description: OpenAI AI chat, image, and audio operations
+
 paths:
   /healthz:
     get:
@@ -24,6 +31,258 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /reflections:
+    get:
+      operationId: listReflections
+      tags: [reflections]
+      summary: List all reflections for current user
+      responses:
+        "200":
+          description: List of reflections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reflection"
+    post:
+      operationId: createReflection
+      tags: [reflections]
+      summary: Create a new reflection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReflectionBody"
+      responses:
+        "201":
+          description: Created reflection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reflection"
+
+  /reflections/{id}:
+    get:
+      operationId: getReflection
+      tags: [reflections]
+      summary: Get a reflection with its recommendations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reflection with recommendations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReflectionWithRecommendations"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      operationId: deleteReflection
+      tags: [reflections]
+      summary: Delete a reflection
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /reflections/{id}/analyze:
+    post:
+      operationId: analyzeReflection
+      tags: [reflections]
+      summary: Analyze a reflection with AI - generates visual and recommendations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Analysis results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisResult"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get dashboard statistics for current user
+      responses:
+        "200":
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /openai/conversations:
+    get:
+      operationId: listOpenaiConversations
+      tags: [openai]
+      summary: List all conversations
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenaiConversation"
+    post:
+      operationId: createOpenaiConversation
+      tags: [openai]
+      summary: Create a new conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOpenaiConversationBody"
+      responses:
+        "201":
+          description: Created conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiConversation"
+
+  /openai/conversations/{id}:
+    get:
+      operationId: getOpenaiConversation
+      tags: [openai]
+      summary: Get conversation with messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiConversationWithMessages"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiError"
+    delete:
+      operationId: deleteOpenaiConversation
+      tags: [openai]
+      summary: Delete a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiError"
+
+  /openai/conversations/{id}/messages:
+    get:
+      operationId: listOpenaiMessages
+      tags: [openai]
+      summary: List messages in a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenaiMessage"
+    post:
+      operationId: sendOpenaiMessage
+      tags: [openai]
+      summary: Send a text message and receive a streaming text response
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendOpenaiMessageBody"
+      responses:
+        "200":
+          description: SSE stream of assistant text chunks
+          content:
+            text/event-stream: {}
+
+  /openai/generate-image:
+    post:
+      operationId: generateOpenaiImage
+      tags: [openai]
+      summary: Generate an image from a text prompt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateOpenaiImageBody"
+      responses:
+        "200":
+          description: Generated image data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateOpenaiImageResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +293,262 @@ components:
       required:
         - status
 
+    Reflection:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+        text:
+          type: string
+        mood:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        isAnalyzed:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - userId
+        - text
+        - mood
+        - imageUrl
+        - isAnalyzed
+        - createdAt
+        - updatedAt
+
+    Recommendation:
+      type: object
+      properties:
+        id:
+          type: integer
+        reflectionId:
+          type: integer
+        type:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - reflectionId
+        - type
+        - title
+        - description
+        - createdAt
+
+    ReflectionWithRecommendations:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+        text:
+          type: string
+        mood:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        isAnalyzed:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        recommendations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Recommendation"
+      required:
+        - id
+        - userId
+        - text
+        - mood
+        - imageUrl
+        - isAnalyzed
+        - createdAt
+        - updatedAt
+        - recommendations
+
+    CreateReflectionBody:
+      type: object
+      properties:
+        text:
+          type: string
+      required:
+        - text
+
+    AnalysisResult:
+      type: object
+      properties:
+        mood:
+          type: string
+        imageUrl:
+          type: string
+        recommendations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Recommendation"
+        greeting:
+          type: string
+      required:
+        - mood
+        - imageUrl
+        - recommendations
+        - greeting
+
+    DashboardStats:
+      type: object
+      properties:
+        totalReflections:
+          type: integer
+        analyzedReflections:
+          type: integer
+        moodBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/MoodCount"
+        recentReflections:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reflection"
+        streakDays:
+          type: integer
+      required:
+        - totalReflections
+        - analyzedReflections
+        - moodBreakdown
+        - recentReflections
+        - streakDays
+
+    MoodCount:
+      type: object
+      properties:
+        mood:
+          type: string
+        count:
+          type: integer
+      required:
+        - mood
+        - count
+
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    OpenaiConversation:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - createdAt
+
+    OpenaiMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+        conversationId:
+          type: integer
+        role:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - conversationId
+        - role
+        - content
+        - createdAt
+
+    CreateOpenaiConversationBody:
+      type: object
+      properties:
+        title:
+          type: string
+      required:
+        - title
+
+    SendOpenaiMessageBody:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    OpenaiConversationWithMessages:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/OpenaiMessage"
+      required:
+        - id
+        - title
+        - createdAt
+        - messages
+
+    GenerateOpenaiImageBody:
+      type: object
+      properties:
+        prompt:
+          type: string
+        size:
+          type: string
+          enum: ["1024x1024", "512x512", "256x256"]
+      required:
+        - prompt
+
+    GenerateOpenaiImageResponse:
+      type: object
+      properties:
+        b64_json:
+          type: string
+      required:
+        - b64_json
+
+    OpenaiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
